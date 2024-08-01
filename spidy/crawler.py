@@ -837,7 +837,7 @@ FINISHED = False
 THREAD_RUNNING = True
 
 
-def init(args=None):
+def init(arg_file=None):
     """
     Sets all of the variables for spidy,
     and as a result can be used for effectively resetting the crawler.
@@ -855,15 +855,17 @@ def init(args=None):
 
     # Getting Arguments
 
-    if args:
+    if not path.exists(path.join(PACKAGE_DIR, 'config')):
+        write_log('INIT', 'No config folder available.')
+        USE_CONFIG = False
+    elif arg_file:
         write_log('INIT', 'Config file name:', status='INPUT')
         while True:
-            input_ = input()
             try:
-                if input_[-4:] == '.cfg':
-                    file_path = path.join(PACKAGE_DIR, 'config', input_)
+                if arg_file[-4:] == '.cfg':
+                    file_path = path.join(PACKAGE_DIR, 'config', arg_file)
                 else:
-                    file_path = path.join(PACKAGE_DIR, 'config', '{0}.cfg'.format(input_))
+                    file_path = path.join(PACKAGE_DIR, 'config', '{0}.cfg'.format(arg_file))
                 write_log('INIT', 'Loading configuration settings from {0}'.format(file_path))
                 with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
                     for line in file.readlines():
@@ -874,10 +876,6 @@ def init(args=None):
                 # raise FileNotFoundError()
             
             write_log('INIT', 'Please name a valid .cfg file.')
-
-    if not path.exists(path.join(PACKAGE_DIR, 'config')):
-        write_log('INIT', 'No config folder available.')
-        USE_CONFIG = False
     else:
         write_log('INIT', 'Should spidy load settings from an available config file? (y/n):', status='INPUT')
         while True:
@@ -1275,8 +1273,8 @@ def main():
         parser.add_argument("-f", "--config-file", type=str, help="Path to the desired config file.", required=False)
         args = parser.parse_args()
 
-        if args["f"]:
-            init(args["f"])
+        if args.config_file is not None:
+            init(args.config_file)
         else:
             init()
     except KeyboardInterrupt:
