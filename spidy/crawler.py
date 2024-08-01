@@ -432,7 +432,7 @@ def check_link(item, robots_index=None):
     if robots_index and not robots_index.is_allowed(item):
         return True
     if RESTRICT:
-        if DOMAIN not in item.split('/')[2][]:
+        if DOMAIN not in item.split('/')[2]:
             # Splitting a url on '/' results in ['http(s)', '', '[sub]DOMAIN', 'dir', 'dir', ...]
             return True
     if len(item) < 10 or len(item) > 255:
