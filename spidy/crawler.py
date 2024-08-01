@@ -448,6 +448,11 @@ def check_link(item, robots_index=None):
         if scope in item:
             return True
 
+    # Check if the URL has already been processed
+    if item in FOUND_URLS:
+        return True
+
+    FOUND_URLS.add(item)
     return False
 
 
@@ -1268,6 +1273,9 @@ def main():
     global TODO_FILE, DONE_FILE, ERR_LOG_FILE, WORD_FILE
     global RESPECT_ROBOTS, RESTRICT, DOMAIN, OUT_OF_SCOPE
     global WORDS, TODO, DONE
+    global FOUND_URLS
+
+    FOUND_URLS = set()
 
     try:
         parser = argparse.ArgumentParser(prog="net.py", description="Builds Containernet Topology")
