@@ -892,285 +892,286 @@ def init(arg_file=None):
             else:
                 handle_invalid_input()
 
-    if USE_CONFIG:
-        write_log('INIT', 'Config file name:', status='INPUT')
-        while True:
-            input_ = input()
-            try:
-                if input_[-4:] == '.cfg':
-                    file_path = path.join(PACKAGE_DIR, 'config', input_)
-                else:
-                    file_path = path.join(PACKAGE_DIR, 'config', '{0}.cfg'.format(input_))
-                write_log('INIT', 'Loading configuration settings from {0}'.format(file_path))
-                with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
-                    for line in file.readlines():
-                        exec(line, globals())
-                break
-            except FileNotFoundError:
-                write_log('INIT', 'Config file not found.', status='ERROR')
-                # raise FileNotFoundError()
-            
-            write_log('INIT', 'Please name a valid .cfg file.')
-
-    else:
-        write_log('INIT', 'Please enter the following arguments. Leave blank to use the default values.')
-
-        write_log('INIT', 'How many parallel threads should be used for crawler? (Default: 1):', status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                THREAD_COUNT = 1
-                break
-            elif input_.isdigit():
-                THREAD_COUNT = int(input_)
-                break
-            else:
-                handle_invalid_input('integer.')
-
-        write_log('INIT', 'Should spidy load from existing save files? (y/n) (Default: Yes):', status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                OVERWRITE = False
-                break
-            elif input_ in yes:
-                OVERWRITE = False
-                break
-            elif input_ in no:
-                OVERWRITE = True
-                break
-            else:
-                handle_invalid_input()
-
-        write_log('INIT', 'Should spidy raise NEW errors and stop crawling? (y/n) (Default: No):', status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                RAISE_ERRORS = False
-                break
-            elif input_ in yes:
-                RAISE_ERRORS = True
-                break
-            elif input_ in no:
-                RAISE_ERRORS = False
-                break
-            else:
-                handle_invalid_input()
-
-        write_log('INIT', 'Should spidy save the pages it scrapes to the saved folder? (y/n) (Default: Yes):', status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                SAVE_PAGES = True
-                break
-            elif input_ in yes:
-                SAVE_PAGES = True
-                break
-            elif input_ in no:
-                SAVE_PAGES = False
-                break
-            else:
-                handle_invalid_input()
-
-        if SAVE_PAGES:
-            write_log('INIT', 'Should spidy zip saved documents when autosaving? (y/n) (Default: No):', status='INPUT')
-            while True:
-                input_ = input()
-                if not bool(input_):
-                    ZIP_FILES = False
-                    break
-                elif input_ in yes:
-                    ZIP_FILES = True
-                    break
-                elif input_ in no:
-                    ZIP_FILES = False
-                    break
-                else:
-                    handle_invalid_input()
-        else:
-            ZIP_FILES = False
-
-        write_log('INIT', 'Should spidy download documents larger than 500 MB? (y/n) (Default: No):', status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                OVERRIDE_SIZE = False
-                break
-            elif input_ in yes:
-                OVERRIDE_SIZE = True
-                break
-            elif input_ in no:
-                OVERRIDE_SIZE = False
-                break
-            else:
-                handle_invalid_input()
-
-        write_log('INIT', 'Should spidy scrape words and save them? (y/n) (Default: Yes):', status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                SAVE_WORDS = True
-                break
-            elif input_ in yes:
-                SAVE_WORDS = True
-                break
-            elif input_ in no:
-                SAVE_WORDS = False
-                break
-            else:
-                handle_invalid_input()
-
-        write_log('INIT', 'Should spidy restrict crawling to a specific domain only? (y/n) (Default: No):',
-                  status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                RESTRICT = False
-                break
-            elif input_ in yes:
-                RESTRICT = True
-                break
-            elif input_ in no:
-                RESTRICT = False
-                break
-            else:
-                handle_invalid_input()
-
-        if RESTRICT:
-            write_log('INIT', 'What domain should crawling be limited to? Can be subdomains, http/https, etc.',
-                      status='INPUT')
+    if arg_file is None:
+        if USE_CONFIG:
+            write_log('INIT', 'Config file name:', status='INPUT')
             while True:
                 input_ = input()
                 try:
-                    DOMAIN = input_
+                    if input_[-4:] == '.cfg':
+                        file_path = path.join(PACKAGE_DIR, 'config', input_)
+                    else:
+                        file_path = path.join(PACKAGE_DIR, 'config', '{0}.cfg'.format(input_))
+                    write_log('INIT', 'Loading configuration settings from {0}'.format(file_path))
+                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+                        for line in file.readlines():
+                            exec(line, globals())
                     break
-                except KeyError:
-                    handle_invalid_input('string.')
+                except FileNotFoundError:
+                    write_log('INIT', 'Config file not found.', status='ERROR')
+                    # raise FileNotFoundError()
+                
+                write_log('INIT', 'Please name a valid .cfg file.')
 
-        write_log('INIT', 'Should spidy respect sites\' robots.txt? (y/n) (Default: Yes):', status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                RESPECT_ROBOTS = True
-                break
-            elif input_ in yes:
-                RESPECT_ROBOTS = True
-                break
-            elif input_ in no:
-                RESPECT_ROBOTS = False
-                break
-            else:
-                handle_invalid_input()
-
-        write_log('INIT', 'What HTTP browser headers should spidy imitate?', status='INPUT')
-        write_log('INIT', 'Choices: spidy (default), Chrome, Firefox, IE, Edge, Custom:', status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                HEADER = HEADERS['spidy']
-                break
-            elif input_.lower() == 'custom':
-                # Here we just trust that the user is inputting valid headers...
-                write_log('INIT', 'Valid HTTP headers:', status='INPUT')
-                HEADER = input()
-                break
-            else:
-                try:
-                    HEADER = HEADERS[input_]
-                    break
-                except KeyError:
-                    handle_invalid_input('browser name.')
-
-        write_log('INIT', 'Location of the TODO save file (Default: crawler_todo.txt):', status='INPUT')
-        input_ = input()
-        if not bool(input_):
-            TODO_FILE = 'crawler_todo.txt'
         else:
-            TODO_FILE = input_
+            write_log('INIT', 'Please enter the following arguments. Leave blank to use the default values.')
 
-        write_log('INIT', 'Location of the DONE save file (Default: crawler_done.txt):', status='INPUT')
-        input_ = input()
-        if not bool(input_):
-            DONE_FILE = 'crawler_done.txt'
-        else:
-            DONE_FILE = input_
-
-        if SAVE_WORDS:
-            write_log('INIT', 'Location of the words save file (Default: crawler_words.txt):', status='INPUT')
-            input_ = input()
-            if not bool(input_):
-                WORD_FILE = 'crawler_words.txt'
-            else:
-                WORD_FILE = input_
-        else:
-            WORD_FILE = 'None'
-
-        write_log('INIT', 'After how many queried links should the crawler autosave? (Default: 100):', status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                SAVE_COUNT = 100
-                break
-            elif input_.isdigit():
-                SAVE_COUNT = int(input_)
-                break
-            else:
-                handle_invalid_input('integer.')
-
-        if not RAISE_ERRORS:
-            write_log('INIT', 'After how many new errors should spidy stop? (Default: 5):', status='INPUT')
+            write_log('INIT', 'How many parallel threads should be used for crawler? (Default: 1):', status='INPUT')
             while True:
                 input_ = input()
                 if not bool(input_):
-                    MAX_NEW_ERRORS = 5
+                    THREAD_COUNT = 1
                     break
                 elif input_.isdigit():
-                    MAX_NEW_ERRORS = int(input_)
+                    THREAD_COUNT = int(input_)
                     break
                 else:
                     handle_invalid_input('integer.')
-        else:
-            MAX_NEW_ERRORS = 1
 
-        write_log('INIT', 'After how many known errors should spidy stop? (Default: 10):', status='INPUT')
-        while True:
+            write_log('INIT', 'Should spidy load from existing save files? (y/n) (Default: Yes):', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    OVERWRITE = False
+                    break
+                elif input_ in yes:
+                    OVERWRITE = False
+                    break
+                elif input_ in no:
+                    OVERWRITE = True
+                    break
+                else:
+                    handle_invalid_input()
+
+            write_log('INIT', 'Should spidy raise NEW errors and stop crawling? (y/n) (Default: No):', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    RAISE_ERRORS = False
+                    break
+                elif input_ in yes:
+                    RAISE_ERRORS = True
+                    break
+                elif input_ in no:
+                    RAISE_ERRORS = False
+                    break
+                else:
+                    handle_invalid_input()
+
+            write_log('INIT', 'Should spidy save the pages it scrapes to the saved folder? (y/n) (Default: Yes):', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    SAVE_PAGES = True
+                    break
+                elif input_ in yes:
+                    SAVE_PAGES = True
+                    break
+                elif input_ in no:
+                    SAVE_PAGES = False
+                    break
+                else:
+                    handle_invalid_input()
+
+            if SAVE_PAGES:
+                write_log('INIT', 'Should spidy zip saved documents when autosaving? (y/n) (Default: No):', status='INPUT')
+                while True:
+                    input_ = input()
+                    if not bool(input_):
+                        ZIP_FILES = False
+                        break
+                    elif input_ in yes:
+                        ZIP_FILES = True
+                        break
+                    elif input_ in no:
+                        ZIP_FILES = False
+                        break
+                    else:
+                        handle_invalid_input()
+            else:
+                ZIP_FILES = False
+
+            write_log('INIT', 'Should spidy download documents larger than 500 MB? (y/n) (Default: No):', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    OVERRIDE_SIZE = False
+                    break
+                elif input_ in yes:
+                    OVERRIDE_SIZE = True
+                    break
+                elif input_ in no:
+                    OVERRIDE_SIZE = False
+                    break
+                else:
+                    handle_invalid_input()
+
+            write_log('INIT', 'Should spidy scrape words and save them? (y/n) (Default: Yes):', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    SAVE_WORDS = True
+                    break
+                elif input_ in yes:
+                    SAVE_WORDS = True
+                    break
+                elif input_ in no:
+                    SAVE_WORDS = False
+                    break
+                else:
+                    handle_invalid_input()
+
+            write_log('INIT', 'Should spidy restrict crawling to a specific domain only? (y/n) (Default: No):',
+                    status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    RESTRICT = False
+                    break
+                elif input_ in yes:
+                    RESTRICT = True
+                    break
+                elif input_ in no:
+                    RESTRICT = False
+                    break
+                else:
+                    handle_invalid_input()
+
+            if RESTRICT:
+                write_log('INIT', 'What domain should crawling be limited to? Can be subdomains, http/https, etc.',
+                        status='INPUT')
+                while True:
+                    input_ = input()
+                    try:
+                        DOMAIN = input_
+                        break
+                    except KeyError:
+                        handle_invalid_input('string.')
+
+            write_log('INIT', 'Should spidy respect sites\' robots.txt? (y/n) (Default: Yes):', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    RESPECT_ROBOTS = True
+                    break
+                elif input_ in yes:
+                    RESPECT_ROBOTS = True
+                    break
+                elif input_ in no:
+                    RESPECT_ROBOTS = False
+                    break
+                else:
+                    handle_invalid_input()
+
+            write_log('INIT', 'What HTTP browser headers should spidy imitate?', status='INPUT')
+            write_log('INIT', 'Choices: spidy (default), Chrome, Firefox, IE, Edge, Custom:', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    HEADER = HEADERS['spidy']
+                    break
+                elif input_.lower() == 'custom':
+                    # Here we just trust that the user is inputting valid headers...
+                    write_log('INIT', 'Valid HTTP headers:', status='INPUT')
+                    HEADER = input()
+                    break
+                else:
+                    try:
+                        HEADER = HEADERS[input_]
+                        break
+                    except KeyError:
+                        handle_invalid_input('browser name.')
+
+            write_log('INIT', 'Location of the TODO save file (Default: crawler_todo.txt):', status='INPUT')
             input_ = input()
             if not bool(input_):
-                MAX_KNOWN_ERRORS = 20
-                break
-            elif input_.isdigit():
-                MAX_KNOWN_ERRORS = int(input_)
-                break
+                TODO_FILE = 'crawler_todo.txt'
             else:
-                handle_invalid_input('integer.')
+                TODO_FILE = input_
 
-        write_log('INIT', 'After how many HTTP errors should spidy stop? (Default: 20):', status='INPUT')
-        while True:
+            write_log('INIT', 'Location of the DONE save file (Default: crawler_done.txt):', status='INPUT')
             input_ = input()
             if not bool(input_):
-                MAX_HTTP_ERRORS = 50
-                break
-            elif not input_.isdigit():
-                MAX_HTTP_ERRORS = int(input_)
-                break
+                DONE_FILE = 'crawler_done.txt'
             else:
-                handle_invalid_input('integer.')
+                DONE_FILE = input_
 
-        write_log('INIT', 'After encountering how many new MIME types should spidy stop? (Default: 20):',
-                  status='INPUT')
-        while True:
-            input_ = input()
-            if not bool(input_):
-                MAX_NEW_MIMES = 10
-                break
-            elif input_.isdigit():
-                MAX_NEW_MIMES = int(input_)
-                break
+            if SAVE_WORDS:
+                write_log('INIT', 'Location of the words save file (Default: crawler_words.txt):', status='INPUT')
+                input_ = input()
+                if not bool(input_):
+                    WORD_FILE = 'crawler_words.txt'
+                else:
+                    WORD_FILE = input_
             else:
-                handle_invalid_input('integer')
+                WORD_FILE = 'None'
 
-        # Remove INPUT variable from memory
-        del input_
+            write_log('INIT', 'After how many queried links should the crawler autosave? (Default: 100):', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    SAVE_COUNT = 100
+                    break
+                elif input_.isdigit():
+                    SAVE_COUNT = int(input_)
+                    break
+                else:
+                    handle_invalid_input('integer.')
+
+            if not RAISE_ERRORS:
+                write_log('INIT', 'After how many new errors should spidy stop? (Default: 5):', status='INPUT')
+                while True:
+                    input_ = input()
+                    if not bool(input_):
+                        MAX_NEW_ERRORS = 5
+                        break
+                    elif input_.isdigit():
+                        MAX_NEW_ERRORS = int(input_)
+                        break
+                    else:
+                        handle_invalid_input('integer.')
+            else:
+                MAX_NEW_ERRORS = 1
+
+            write_log('INIT', 'After how many known errors should spidy stop? (Default: 10):', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    MAX_KNOWN_ERRORS = 20
+                    break
+                elif input_.isdigit():
+                    MAX_KNOWN_ERRORS = int(input_)
+                    break
+                else:
+                    handle_invalid_input('integer.')
+
+            write_log('INIT', 'After how many HTTP errors should spidy stop? (Default: 20):', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    MAX_HTTP_ERRORS = 50
+                    break
+                elif not input_.isdigit():
+                    MAX_HTTP_ERRORS = int(input_)
+                    break
+                else:
+                    handle_invalid_input('integer.')
+
+            write_log('INIT', 'After encountering how many new MIME types should spidy stop? (Default: 20):',
+                    status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    MAX_NEW_MIMES = 10
+                    break
+                elif input_.isdigit():
+                    MAX_NEW_MIMES = int(input_)
+                    break
+                else:
+                    handle_invalid_input('integer')
+
+            # Remove INPUT variable from memory
+            del input_
 
     if OVERWRITE:
         write_log('INIT', 'Creating save files...')
