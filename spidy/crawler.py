@@ -444,9 +444,10 @@ def check_link(item, robots_index=None):
         return True
     
     # Check each domain, subdomain, or path in the out of scope blacklist
-    for scope in OUT_OF_SCOPE:
-        if scope in item:
-            return True
+    if OUT_OF_SCOPE is not None:
+        for scope in OUT_OF_SCOPE:
+            if scope in item:
+                return True
 
     return False
 
