@@ -443,9 +443,9 @@ def check_link(item, robots_index=None):
     elif item in copy(DONE.queue):
         return True
     
-    # Check each domain in the out of scope blacklist
-    for domain in OUT_OF_SCOPE:
-        if domain in item:
+    # Check each domain, subdomain, or path in the out of scope blacklist
+    for scope in OUT_OF_SCOPE:
+        if scope in item:
             return True
 
     return False
