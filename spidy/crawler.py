@@ -3,6 +3,7 @@
 spidy Web Crawler
 Built by rivermont and FalconWarriorr
 """
+import argparse
 import time
 import shutil
 import requests
@@ -829,7 +830,7 @@ FINISHED = False
 THREAD_RUNNING = True
 
 
-def init():
+def init(args=None):
     """
     Sets all of the variables for spidy,
     and as a result can be used for effectively resetting the crawler.
@@ -846,6 +847,26 @@ def init():
     global WORDS, TODO, DONE, THREAD_COUNT
 
     # Getting Arguments
+
+    if (args):
+        write_log('INIT', 'Config file name:', status='INPUT')
+        while True:
+            input_ = input()
+            try:
+                if input_[-4:] == '.cfg':
+                    file_path = path.join(PACKAGE_DIR, 'config', input_)
+                else:
+                    file_path = path.join(PACKAGE_DIR, 'config', '{0}.cfg'.format(input_))
+                write_log('INIT', 'Loading configuration settings from {0}'.format(file_path))
+                with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+                    for line in file.readlines():
+                        exec(line, globals())
+                break
+            except FileNotFoundError:
+                write_log('INIT', 'Config file not found.', status='ERROR')
+                # raise FileNotFoundError()
+            
+            write_log('INIT', 'Please name a valid .cfg file.')
 
     if not path.exists(path.join(PACKAGE_DIR, 'config')):
         write_log('INIT', 'No config folder available.')
@@ -1243,7 +1264,14 @@ def main():
     global WORDS, TODO, DONE
 
     try:
-        init()
+        parser = argparse.ArgumentParser(prog="net.py", description="Builds Containernet Topology")
+        parser.add_argument("-f", "--config-file", type=str, help="Path to the desired config file.", required=False)
+        args = parser.parse_args()
+
+        if (args["f"]):
+            init(args["f"])
+        else:
+            init()
     except KeyboardInterrupt:
         handle_keyboard_interrupt()
 
