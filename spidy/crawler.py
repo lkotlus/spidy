@@ -18,6 +18,8 @@ from lxml import etree
 from lxml.html import iterlinks, resolve_base_href, make_links_absolute
 from reppy.robots import Robots
 from seleniumwire import webdriver
+from selenium.webdriver.common.alert import Alert
+from selenium.common.exceptions import TimeoutException, UnexpectedAlertPresentException, WebDriverException
 from types import SimpleNamespace
 
 try:
@@ -243,12 +245,27 @@ def crawl(url, browser, thread_id=0):
     # If the SizeError is raised it will be caught in the except block in the run section,
     # and the following code will not be run.
     r = requests.get(url, headers=HEADER)
+
+    print(f"attempting url: {url}")
     
     if (browser is None):
         page = r  # Get page
     else:
-        browser.get(url)
-        page = SimpleNamespace(text=browser.page_source, content=browser.page_source.encode('utf-8'), headers=r.headers)
+        try:
+            browser.get(url)
+            page = SimpleNamespace(text=browser.page_source, content=browser.page_source.encode('utf-8'), headers=r.headers)
+        except TimeoutException:
+            KNOWN_ERROR_COUNT += 1
+            return []
+        except UnexpectedAlertPresentException:
+            browser.get(url)
+            alert = Alert(browser)
+            alert.accept()
+            page = SimpleNamespace(text=browser.page_source, content=browser.page_source.encode('utf-8'), headers=r.headers)
+            KNOWN_ERROR_COUNT += 1
+        except WebDriverException:
+            KNOWN_ERROR_COUNT += 1
+            return []
 
     word_list = []
     doctype = get_mime_type(page)
@@ -303,6 +320,9 @@ def crawl_worker(thread_id, robots_index):
         browser = webdriver.Firefox(options=browser_options)
 
         browser.request_interceptor = interceptor
+        browser.implicitly_wait(10)
+        browser.set_page_load_timeout(10)
+        webdriver.DesiredCapabilities.FIREFOX["unexpectedAlertBehaviour"] = "accept"
 
     while THREAD_RUNNING:
         # Check if there are more urls to crawl
