@@ -11,6 +11,7 @@ import urllib
 import threading
 import queue
 import logging
+import selenium
 
 from os import path, makedirs
 from copy import copy
