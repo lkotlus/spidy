@@ -231,7 +231,6 @@ class RobotsIndex(object):
 
 write_log('INIT', 'Creating functions...')
 
-# TODO: Integrate selenium for fully rendered pages
 def crawl(url, browser, thread_id=0):
     global WORDS, OVERRIDE_SIZE, HEADER, SAVE_PAGES, SAVE_WORDS
     if not OVERRIDE_SIZE:

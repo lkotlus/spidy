@@ -13,8 +13,8 @@ Pretty simple!
 ![All Platforms!](https://img.shields.io/badge/Windows,%20OS/X,%20Linux-%20%20-brightgreen.svg)
 ![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.png?v=103)
 <br>
-![Lines of Code: 1553](https://img.shields.io/badge/lines%20of%20code-1553-brightgreen.svg)
-![Lines of Docs: 605](https://img.shields.io/badge/lines%20of%20docs-605-orange.svg)
+![Lines of Code: 1810](https://img.shields.io/badge/lines%20of%20code-1553-brightgreen.svg)
+![Lines of Docs: 614](https://img.shields.io/badge/lines%20of%20docs-605-orange.svg)
 [![Last Commit](https://img.shields.io/github/last-commit/rivermont/spidy.svg)](https://github.com/rivermont/spidy/graphs/punch-card)
 [![Travis CI Status](https://img.shields.io/travis/com/rivermont/spidy)](https://travis-ci.com/github/rivermont/spidy)
 [![PyPI Wheel](https://img.shields.io/pypi/wheel/spidy-web-crawler.svg)](https://pypi.org/project/spidy-web-crawler/)
