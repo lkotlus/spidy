@@ -14,7 +14,7 @@ Pretty simple!
 ![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.png?v=103)
 <br>
 ![Lines of Code: 1810](https://img.shields.io/badge/lines%20of%20code-1553-brightgreen.svg)
-![Lines of Docs: 614](https://img.shields.io/badge/lines%20of%20docs-605-orange.svg)
+![Lines of Docs: 616](https://img.shields.io/badge/lines%20of%20docs-605-orange.svg)
 [![Last Commit](https://img.shields.io/github/last-commit/rivermont/spidy.svg)](https://github.com/rivermont/spidy/graphs/punch-card)
 [![Travis CI Status](https://img.shields.io/travis/com/rivermont/spidy)](https://travis-ci.com/github/rivermont/spidy)
 [![PyPI Wheel](https://img.shields.io/pypi/wheel/spidy-web-crawler.svg)](https://pypi.org/project/spidy-web-crawler/)
@@ -101,6 +101,7 @@ Here are some features we figure are worth noting.
   - Cross-Platform compatibility: spidy will work on all three major operating systems, Windows, Mac OS/X, and Linux!
   - Frequent Timestamp Logging: Spidy logs almost every action it takes to both the console and one of two log files.
   - Browser Spoofing: Make requests using User Agents from 4 popular web browsers, use a custom spidy bot one, or create your own!
+  - Headless Browser Support: Render full webpages to get dynamic content.
   - Portability: Move spidy's folder and its contents somewhere else and it will run right where it left off. *Note*: This only works if you run it from source code.
   - User-Friendly Logs: Both the console and log file messages are simple and easy to interpret, but packed with information.
   - Webpage saving: Spidy downloads each page that it runs into, regardless of file type. The crawler uses the HTTP `Content-Type` header returned with most files to determine the file type.
@@ -225,6 +226,7 @@ See the [`CONTRIBUTING.md`](https://github.com/rivermont/spidy/blob/master/spidy
 * [quatroka](https://github.com/quatroka) - Fixed testing bugs.
 * [stevelle](https://github.com/stevelle) - Respect robots.txt.
 * [thatguywiththatname](https://github.com/thatguywiththatname) - README link corrections.
+* [lkotlus](https://github.com/lkotlus) - Optimizations, out of scope items, and headless browser support.
 
 # License
 We used the [Gnu General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html) (see [`LICENSE`](https://github.com/rivermont/spidy/blob/master/LICENSE)) as it was the license that best suited our needs.<br>
