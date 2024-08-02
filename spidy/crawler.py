@@ -11,13 +11,14 @@ import urllib
 import threading
 import queue
 import logging
-import selenium
 
 from os import path, makedirs
 from copy import copy
 from lxml import etree
 from lxml.html import iterlinks, resolve_base_href, make_links_absolute
 from reppy.robots import Robots
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 
 try:
     from spidy import __version__
@@ -228,7 +229,7 @@ class RobotsIndex(object):
 
 write_log('INIT', 'Creating functions...')
 
-
+# TODO: Integrate selenium for fully rendered pages
 def crawl(url, thread_id=0):
     global WORDS, OVERRIDE_SIZE, HEADER, SAVE_PAGES, SAVE_WORDS
     if not OVERRIDE_SIZE:
