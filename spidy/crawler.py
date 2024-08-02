@@ -1299,7 +1299,7 @@ def handle_keyboard_interrupt():
 # Used by the webdriver to add custom headers
 def interceptor(request):
     for key in HEADER:
-        request[key] = HEADER[key]
+        request.headers[key] = HEADER[key]
 
 
 def main():
