@@ -830,7 +830,7 @@ no = ['n', 'no', 'N', 'No', 'False', 'false']
 HEADER = {}
 SAVE_COUNT, MAX_NEW_ERRORS, MAX_KNOWN_ERRORS, MAX_HTTP_ERRORS = 0, 0, 0, 0
 MAX_NEW_MIMES = 0
-RESPECT_ROBOTS, RESTRICT, DOMAIN = False, False, ''
+RESPECT_ROBOTS, RESTRICT, DOMAIN, OUT_OF_SCOPE = False, False, '', []
 USE_CONFIG, OVERWRITE, RAISE_ERRORS, ZIP_FILES, OVERRIDE_SIZE = False, False, False, False, False
 SAVE_PAGES, SAVE_WORDS = False, False
 TODO_FILE, DONE_FILE, WORD_FILE = '', '', ''
@@ -840,6 +840,7 @@ THREAD_LIST = []
 save_mutex = threading.Lock()
 FINISHED = False
 THREAD_RUNNING = True
+FOUND_URLS = set()
 
 
 def init(arg_file=None):
@@ -1274,8 +1275,6 @@ def main():
     global RESPECT_ROBOTS, RESTRICT, DOMAIN, OUT_OF_SCOPE
     global WORDS, TODO, DONE
     global FOUND_URLS
-
-    FOUND_URLS = set()
 
     try:
         parser = argparse.ArgumentParser(prog="net.py", description="Builds Containernet Topology")
