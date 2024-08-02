@@ -2,4 +2,5 @@ requests
 lxml
 flake8
 reppy
-selenium
+selenium-wire
+blinker==1.7.0

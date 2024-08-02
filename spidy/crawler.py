@@ -17,8 +17,8 @@ from copy import copy
 from lxml import etree
 from lxml.html import iterlinks, resolve_base_href, make_links_absolute
 from reppy.robots import Robots
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+from seleniumwire import webdriver
+from types import SimpleNamespace
 
 try:
     from spidy import __version__
@@ -230,7 +230,7 @@ class RobotsIndex(object):
 write_log('INIT', 'Creating functions...')
 
 # TODO: Integrate selenium for fully rendered pages
-def crawl(url, thread_id=0):
+def crawl(url, browser, thread_id=0):
     global WORDS, OVERRIDE_SIZE, HEADER, SAVE_PAGES, SAVE_WORDS
     if not OVERRIDE_SIZE:
         try:
@@ -242,7 +242,14 @@ def crawl(url, thread_id=0):
             raise SizeError
     # If the SizeError is raised it will be caught in the except block in the run section,
     # and the following code will not be run.
-    page = requests.get(url, headers=HEADER)  # Get page
+    r = requests.get(url, headers=HEADER)
+    
+    if (browser is None):
+        page = r  # Get page
+    else:
+        browser.get(url)
+        page = SimpleNamespace(text=browser.page_source, content=browser.page_source.encode('utf-8'), headers=r.headers)
+
     word_list = []
     doctype = get_mime_type(page)
     if doctype.find('image') < 0 and doctype.find('video') < 0:
@@ -279,13 +286,23 @@ def crawl_worker(thread_id, robots_index):
     # Declare global variables
     global VERSION, START_TIME, START_TIME_LONG
     global LOG_FILE, LOG_FILE_NAME, ERR_LOG_FILE_NAME
-    global HEADER, WORKING_DIR, KILL_LIST
+    global HEADER, USE_BROWSER, WORKING_DIR, KILL_LIST
     global COUNTER, NEW_ERROR_COUNT, KNOWN_ERROR_COUNT, HTTP_ERROR_COUNT, NEW_MIME_COUNT
     global MAX_NEW_ERRORS, MAX_KNOWN_ERRORS, MAX_HTTP_ERRORS, MAX_NEW_MIMES
     global USE_CONFIG, OVERWRITE, RAISE_ERRORS, ZIP_FILES, OVERRIDE_SIZE, SAVE_WORDS, SAVE_PAGES, SAVE_COUNT
     global TODO_FILE, DONE_FILE, ERR_LOG_FILE, WORD_FILE
-    global RESPECT_ROBOTS, RESTRICT, DOMAIN
-    global WORDS, TODO, DONE, THREAD_RUNNING
+    global RESPECT_ROBOTS, RESTRICT, DOMAIN, OUT_OF_SCOPE
+    global WORDS, TODO, DONE
+    global FOUND_URLS
+
+    browser = None
+    if (USE_BROWSER):
+        browser_options = webdriver.FirefoxOptions()
+        browser_options.add_argument('--headless')
+        
+        browser = webdriver.Firefox(options=browser_options)
+
+        browser.request_interceptor = interceptor
 
     while THREAD_RUNNING:
         # Check if there are more urls to crawl
@@ -338,7 +355,7 @@ def crawl_worker(thread_id, robots_index):
                 else:
                     if check_link(url, robots_index):  # If the link is invalid
                         continue
-                    links = crawl(url, thread_id)
+                    links = crawl(url, browser, thread_id)
                     for link in links:
                         # Skip empty links
                         if len(link) <= 0 or link == "/":
@@ -830,6 +847,7 @@ no = ['n', 'no', 'N', 'No', 'False', 'false']
 
 # Initialize variables as empty that will be needed in the global scope
 HEADER = {}
+USE_BROWSER = False
 SAVE_COUNT, MAX_NEW_ERRORS, MAX_KNOWN_ERRORS, MAX_HTTP_ERRORS = 0, 0, 0, 0
 MAX_NEW_MIMES = 0
 RESPECT_ROBOTS, RESTRICT, DOMAIN, OUT_OF_SCOPE = False, False, '', []
@@ -853,13 +871,14 @@ def init(arg_file=None):
     # Declare global variables
     global VERSION, START_TIME, START_TIME_LONG
     global LOG_FILE, LOG_FILE_NAME, ERR_LOG_FILE_NAME
-    global HEADER, PACKAGE_DIR, WORKING_DIR, KILL_LIST
+    global HEADER, USE_BROWSER, WORKING_DIR, KILL_LIST
     global COUNTER, NEW_ERROR_COUNT, KNOWN_ERROR_COUNT, HTTP_ERROR_COUNT, NEW_MIME_COUNT
     global MAX_NEW_ERRORS, MAX_KNOWN_ERRORS, MAX_HTTP_ERRORS, MAX_NEW_MIMES
     global USE_CONFIG, OVERWRITE, RAISE_ERRORS, ZIP_FILES, OVERRIDE_SIZE, SAVE_WORDS, SAVE_PAGES, SAVE_COUNT
     global TODO_FILE, DONE_FILE, ERR_LOG_FILE, WORD_FILE
-    global RESPECT_ROBOTS, RESTRICT, DOMAIN
-    global WORDS, TODO, DONE, THREAD_COUNT
+    global RESPECT_ROBOTS, RESTRICT, DOMAIN, OUT_OF_SCOPE
+    global WORDS, TODO, DONE
+    global FOUND_URLS
 
     # Getting Arguments
 
@@ -1090,6 +1109,21 @@ def init(arg_file=None):
                     except KeyError:
                         handle_invalid_input('browser name.')
 
+            write_log('INIT', 'Should spidy use a headless browser? (y/n) (Default: No)', status='INPUT')
+            while True:
+                input_ = input()
+                if not bool(input_):
+                    USE_BROWSER = True
+                    break
+                elif input_ in yes:
+                    USE_BROWSER = True
+                    break
+                elif input_ in no:
+                    USE_BROWSER = False
+                    break
+                else:
+                    handle_invalid_input()
+
             write_log('INIT', 'Location of the TODO save file (Default: crawler_todo.txt):', status='INPUT')
             input_ = input()
             if not bool(input_):
@@ -1262,6 +1296,12 @@ def handle_keyboard_interrupt():
     done_crawling(True)
 
 
+# Used by the webdriver to add custom headers
+def interceptor(request):
+    for key in HEADER:
+        request[key] = HEADER[key]
+
+
 def main():
     """
     The main function of spidy.
@@ -1269,7 +1309,7 @@ def main():
     # Declare global variables
     global VERSION, START_TIME, START_TIME_LONG
     global LOG_FILE, LOG_FILE_NAME, ERR_LOG_FILE_NAME
-    global HEADER, WORKING_DIR, KILL_LIST
+    global HEADER, USE_BROWSER, WORKING_DIR, KILL_LIST
     global COUNTER, NEW_ERROR_COUNT, KNOWN_ERROR_COUNT, HTTP_ERROR_COUNT, NEW_MIME_COUNT
     global MAX_NEW_ERRORS, MAX_KNOWN_ERRORS, MAX_HTTP_ERRORS, MAX_NEW_MIMES
     global USE_CONFIG, OVERWRITE, RAISE_ERRORS, ZIP_FILES, OVERRIDE_SIZE, SAVE_WORDS, SAVE_PAGES, SAVE_COUNT
