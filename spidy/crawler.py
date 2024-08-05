@@ -232,7 +232,7 @@ class RobotsIndex(object):
 write_log('INIT', 'Creating functions...')
 
 def crawl(url, browser, thread_id=0):
-    global WORDS, OVERRIDE_SIZE, HEADER, SAVE_PAGES, SAVE_WORDS
+    global WORDS, OVERRIDE_SIZE, HEADER, SAVE_PAGES, SAVE_WORDS, KNOWN_ERROR_COUNT
     if not OVERRIDE_SIZE:
         try:
             # Attempt to get the size in bytes of the document
@@ -252,16 +252,16 @@ def crawl(url, browser, thread_id=0):
             browser.get(url)
             page = SimpleNamespace(text=browser.page_source, content=browser.page_source.encode('utf-8'), headers=r.headers)
         except TimeoutException:
-            KNOWN_ERROR_COUNT += 1
+            KNOWN_ERROR_COUNT.increment()
             return []
         except UnexpectedAlertPresentException:
             browser.get(url)
             alert = Alert(browser)
             alert.accept()
             page = SimpleNamespace(text=browser.page_source, content=browser.page_source.encode('utf-8'), headers=r.headers)
-            KNOWN_ERROR_COUNT += 1
+            KNOWN_ERROR_COUNT.increment()
         except WebDriverException:
-            KNOWN_ERROR_COUNT += 1
+            KNOWN_ERROR_COUNT.increment()
             return []
 
     word_list = []
