@@ -244,8 +244,6 @@ def crawl(url, browser, thread_id=0):
     # If the SizeError is raised it will be caught in the except block in the run section,
     # and the following code will not be run.
     r = requests.get(url, headers=HEADER)
-
-    print(f"attempting url: {url}")
     
     if (browser is None):
         page = r  # Get page
