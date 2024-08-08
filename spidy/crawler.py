@@ -298,7 +298,7 @@ def crawl_worker(thread_id, robots_index):
     """
 
     # Declare global variables
-    global VERSION, START_TIME, START_TIME_LONG
+    global VERSION, START_TIME, START_TIME_LONG, MAX_TIME
     global LOG_FILE, LOG_FILE_NAME, ERR_LOG_FILE_NAME
     global HEADER, USE_BROWSER, WORKING_DIR, KILL_LIST
     global COUNTER, NEW_ERROR_COUNT, KNOWN_ERROR_COUNT, HTTP_ERROR_COUNT, NEW_MIME_COUNT
@@ -346,6 +346,10 @@ def crawl_worker(thread_id, robots_index):
                HTTP_ERROR_COUNT.val >= MAX_HTTP_ERRORS or \
                NEW_MIME_COUNT.val >= MAX_NEW_MIMES:  # If too many errors have occurred
                 write_log('CRAWL', 'Too many errors have accumulated; stopping crawler.')
+                done_crawling()
+                break
+            elif time.time() - START_TIME >= MAX_TIME: # If too much time has passed
+                write_log('CRAWL', 'Maximum time has been exceeded.')
                 done_crawling()
                 break
             elif COUNTER.val >= SAVE_COUNT:  # If it's time for an autosave
@@ -865,7 +869,7 @@ no = ['n', 'no', 'N', 'No', 'False', 'false']
 # Initialize variables as empty that will be needed in the global scope
 HEADER = {}
 USE_BROWSER = False
-SAVE_COUNT, MAX_NEW_ERRORS, MAX_KNOWN_ERRORS, MAX_HTTP_ERRORS = 0, 0, 0, 0
+SAVE_COUNT, MAX_NEW_ERRORS, MAX_KNOWN_ERRORS, MAX_HTTP_ERRORS, MAX_TIME = 0, 0, 0, 0, float('inf')
 MAX_NEW_MIMES = 0
 RESPECT_ROBOTS, RESTRICT, DOMAIN, OUT_OF_SCOPE = False, False, '', []
 USE_CONFIG, OVERWRITE, RAISE_ERRORS, ZIP_FILES, OVERRIDE_SIZE = False, False, False, False, False

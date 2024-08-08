@@ -272,6 +272,9 @@ TODO
 ## `MAX_NEW_MIMES` - ([Source](https://github.com/rivermont/spidy/blob/master/spidy/crawler.py#L896))
 TODO
 
+## `MAX_TIME` - ([Source](https://github.com/rivermont/spidy/blob/master/spidy/crawler.py#L896))
+Maximum amount of time (in seconds) that a crawl will go for. Defaults to float('inf'), allowing it to run forever.
+
 ## `MIME_TYPES` - ([Source](https://github.com/rivermont/spidy/blob/master/spidy/crawler.py#L705))
 A dictionary of [MIME types](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) encountered by the crawler.<br>
 While there are [thousands of other types](https://www.iana.org/assignments/media-types/media-types.xhtml) that are not listed, to list them all would be impractical:
